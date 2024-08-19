@@ -7,8 +7,18 @@ const PORT = process.env.PORT || 3000;
 
 app.get('/api/exchange-rate', async (req, res) => {
     try {
+        // Add a random query parameter to bypass cache
+        const randomParam = Math.random();
+        const url = `https://www.xe.com/currencyconverter/convert/?Amount=1&From=USD&To=ZMW&_=${randomParam}`;
+
         // Fetch the HTML from the XE currency converter page
-        const { data } = await axios.get('https://www.xe.com/currencyconverter/convert/?Amount=1&From=USD&To=ZMW');
+        const { data } = await axios.get(url, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
 
         // Load the HTML into cheerio
         const $ = cheerio.load(data);
